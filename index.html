@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>GBZINHO SCRIPTS</title>
+<style>
+body {
+    background: #0a0a1a;
+    color: white;
+    text-align: center;
+    font-family: Arial;
+}
+button {
+    padding: 15px;
+    margin: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #0077ff;
+    color: white;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 GBZINHO VOCÊ É LOUCO SCRIPTS 🔥</h1>
+
+<p id="status">Clique para liberar</p>
+
+<button onclick="start()">LIBERAR</button>
+<br><br>
+
+<button id="download" style="display:none;" onclick="go()">DOWNLOAD</button>
+
+<script>
+function start(){
+    document.getElementById("status").innerText = "Aguarde 60 segundos...";
+    setTimeout(()=>{
+        document.getElementById("status").innerText = "Quase lá... mais 60s";
+        setTimeout(()=>{
+            document.getElementById("status").innerText = "Liberado!";
+            document.getElementById("download").style.display = "block";
+        },60000);
+    },60000);
+}
+
+function go(){
+    window.location.href = "https://google.com";
+}
+</script>
+
+</body>
+</html>
