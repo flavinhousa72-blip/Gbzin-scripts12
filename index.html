@@ -1,53 +1,155 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-<title>GBZINHO SCRIPTS</title>
-<style>
-body {
-    background: #0a0a1a;
-    color: white;
-    text-align: center;
-    font-family: Arial;
-}
-button {
-    padding: 15px;
-    margin: 10px;
-    border-radius: 10px;
-    border: none;
-    background: #0077ff;
-    color: white;
-    font-size: 16px;
-}
-</style>
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Seguro - Gabs</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        
+        .container { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #222; width: 350px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        
+        .step-info { font-size: 0.9rem; color: #888; margin-bottom: 10px; }
+        .timer { font-size: 3rem; font-weight: bold; color: #0078ff; margin: 20px 0; }
+        
+        button { background: #0078ff; color: #fff; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; }
+        button:disabled { background: #222; color: #555; cursor: not-allowed; }
+        button:hover:not(:disabled) { background: #0056b3; }
 
+        /* Estilo da Cutscene */
+        #cutscene-area { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 999; display: none; align-items: center; justify-content: center; padding: 30px; }
+        .text-anim { font-size: 1.5rem; text-align: center; font-weight: bold; color: #ff3e3e; }
+
+        /* Efeito de piscar tela */
+        #blackout { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 1000; display: none; }
+        .flash { display: block !important; animation: flashEffect 1.5s forwards; }
+        @keyframes flashEffect { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+
+        /* Tela Final */
+        #final-screen { display: none; width: 90%; max-width: 500px; height: auto; max-height: 90vh; overflow-y: auto; }
+        .script-card { background: #1a1a1a; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid #00ff88; text-align: left; }
+        code { background: #000; display: block; padding: 10px; border-radius: 5px; color: #00ff88; font-size: 12px; margin-bottom: 10px; word-break: break-all; }
+        .btn-copy { background: #333; font-size: 0.9rem; }
+        
+        .hidden { display: none; }
+    </style>
+</head>
 <body>
 
-<h1>🔥 GBZINHO VOCÊ É LOUCO SCRIPTS 🔥</h1>
+    <div id="step-ui" class="container">
+        <div class="step-info">PASSO <span id="current-step">1</span> DE 5</div>
+        <p>Aguarde o anúncio para prosseguir</p>
+        <div id="countdown" class="timer">20s</div>
+        <button id="action-btn" onclick="handleAction()" disabled>AGUARDE...</button>
+    </div>
 
-<p id="status">Clique para liberar</p>
+    <div id="cutscene-area">
+        <div id="scene-text" class="text-anim"></div>
+    </div>
 
-<button onclick="start()">LIBERAR</button>
-<br><br>
+    <div id="final-screen" class="container">
+        <h2 style="color: #00ff88;">Acesso Liberado!</h2>
+        <p>Copie os scripts abaixo:</p>
+        
+        <div class="script-card">
+            <code>loadstring(game:HttpGet('https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FNDayFarm.lua'))()</code>
+            <button class="btn-copy" onclick="copyText(this, `loadstring(game:HttpGet('https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FNDayFarm.lua'))()`)">Copiar Script 1</button>
+        </div>
 
-<button id="download" style="display:none;" onclick="go()">DOWNLOAD</button>
+        <div class="script-card">
+            <code>loadstring(game:HttpGet("https://raw.githubusercontent.com/Devvzn/DevWare/refs/heads/main/DevMain"))()</code>
+            <button class="btn-copy" onclick="copyText(this, `loadstring(game:HttpGet('https://raw.githubusercontent.com/Devvzn/DevWare/refs/heads/main/DevMain'))()`)">Copiar Script 2</button>
+        </div>
 
-<script>
-function start(){
-    document.getElementById("status").innerText = "Aguarde 60 segundos...";
-    setTimeout(()=>{
-        document.getElementById("status").innerText = "Quase lá... mais 60s";
-        setTimeout(()=>{
-            document.getElementById("status").innerText = "Liberado!";
-            document.getElementById("download").style.display = "block";
-        },60000);
-    },60000);
-}
+        <div class="script-card">
+            <code>loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua", true))()</code>
+            <button class="btn-copy" onclick="copyText(this, `loadstring(game:HttpGet('https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua', true))()`)">Copiar Script 3</button>
+        </div>
+    </div>
 
-function go(){
-    window.location.href = "https://google.com";
-}
-</script>
+    <div id="blackout"></div>
 
+    <script>
+        let step = 1;
+        let timeLeft = 20;
+        const btn = document.getElementById('action-btn');
+        const timerDisplay = document.getElementById('countdown');
+
+        function startTimer() {
+            btn.disabled = true;
+            btn.innerText = "CARREGANDO...";
+            timeLeft = 20;
+            timerDisplay.innerText = timeLeft + "s";
+
+            let timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.innerText = timeLeft + "s";
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    btn.disabled = false;
+                    btn.innerText = (step === 5) ? "CLIQUE PARA BAIXAR" : "PRÓXIMO PASSO";
+                }
+            }, 1000);
+        }
+
+        function handleAction() {
+            if (step < 5) {
+                step++;
+                document.getElementById('current-step').innerText = step;
+                startTimer();
+            } else {
+                startCutscene();
+            }
+        }
+
+        function startCutscene() {
+            document.getElementById('step-ui').style.display = 'none';
+            const area = document.getElementById('cutscene-area');
+            const text = document.getElementById('scene-text');
+            area.style.display = 'flex';
+
+            const story = [
+                "Um monstro sombrio aparece correndo! 👹",
+                "Ele está caçando uma criança... 🏃‍♂️",
+                "Ele está chegando cada vez mais perto!",
+                "De repente... UM CERVO APARECE! 🦌",
+                "O CERVO DÁ UM RUGIDOP PODEROSO: ROAAAAAAAR! 🔊",
+                "O monstro se assusta e CAI NO BURACO! 🕳️",
+                "A criança começa a rir: HAHAHAHA! 😂"
+            ];
+
+            let i = 0;
+            let interval = setInterval(() => {
+                text.innerText = story[i];
+                i++;
+                if (i >= story.length) {
+                    clearInterval(interval);
+                    setTimeout(endSequence, 2000);
+                }
+            }, 2500);
+        }
+
+        function endSequence() {
+            const blackout = document.getElementById('blackout');
+            blackout.classList.add('flash');
+
+            setTimeout(() => {
+                document.getElementById('cutscene-area').style.display = 'none';
+                document.getElementById('final-screen').style.display = 'block';
+                document.body.style.overflow = "auto";
+            }, 750);
+        }
+
+        function copyText(button, text) {
+            navigator.clipboard.writeText(text);
+            const original = button.innerText;
+            button.innerText = "COPIADO! ✅";
+            setTimeout(() => button.innerText = original, 2000);
+        }
+
+        // Iniciar
+        window.onload = startTimer;
+    </script>
 </body>
 </html>
